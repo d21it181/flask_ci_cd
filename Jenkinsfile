@@ -41,27 +41,27 @@ pipeline {
             
             steps {
                 script{
-                    echo 'building the application'
-                    echo "Software version is ${NEW_VERSION}"
-                    sh 'mvn build-helper:parse-version versions:set -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.nextMinorVersion}.\\\${parsedVersion.incrementalVersion}\\\${parsedVersion.qualifier?}' 
-                    sh 'mvn clean package'
-                    def version = (readFile('pom.xml') =~ '<version>(.+)</version>')[0][1]
-                    env.IMAGE_NAME = "$version-Build-$BUILD_NUMBER"
-                    sh "docker build -t mayur181/sakshi:${IMAGE_NAME} ."    
+//                     echo 'building the application'
+//                     echo "Software version is ${NEW_VERSION}"
+//                     sh 'mvn build-helper:parse-version versions:set -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.nextMinorVersion}.\\\${parsedVersion.incrementalVersion}\\\${parsedVersion.qualifier?}' 
+//                     sh 'mvn clean package'
+//                     def version = (readFile('pom.xml') =~ '<version>(.+)</version>')[0][1]
+//                     env.IMAGE_NAME = "$version-Build-$BUILD_NUMBER"
+                    sh "docker build -t mayur181/flask ."    
                     }
             }
         }
-      stage('test') {
-          when{  
-             expression{
-                 params.executeTest
-             }
-          }
-            steps {
-                script{echo 'testing the application'
-                sh 'mvn test'}
-            }
-        }
+//       stage('test') {
+//           when{  
+//              expression{
+//                  params.executeTest
+//              }
+//           }
+//             steps {
+//                 script{echo 'testing the application'
+//                 sh 'mvn test'}
+//             }
+//         }
       stage('push') {
         // input{
         //     message "Select the environment to deploy"
@@ -75,23 +75,23 @@ pipeline {
                 script{echo 'deploying the application'
                 withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
                     sh "echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin"
-                    sh "docker push mayur181/sakshi:${IMAGE_NAME}"
+                    sh "docker push mayur181/flask"
                 }}
                 
              }
         }
-        stage('deploy'){
-            steps{
-                script{
-                    def dockerRunCmd = "sudo docker run -p 8080:8080 -d mayur181/sakshi:${IMAGE_NAME}"
-                    def dockerRestart = 'sudo service docker restart'
-                  sshagent(['ec2-prod']) {
-                        sh "ssh -o StrictHostKeyChecking=no ec2-user@54.86.25.242  ${dockerRestart}"
-                        sh "ssh -o StrictHostKeyChecking=no ec2-user@54.86.25.242  ${dockerRunCmd}"
-                    }  
-                }
-            }
-        }
+//         stage('deploy'){
+//             steps{
+//                 script{
+//                     def dockerRunCmd = "sudo docker run -p 8080:8080 -d mayur181/sakshi:${IMAGE_NAME}"
+//                     def dockerRestart = 'sudo service docker restart'
+//                   sshagent(['ec2-prod']) {
+//                         sh "ssh -o StrictHostKeyChecking=no ec2-user@54.86.25.242  ${dockerRestart}"
+//                         sh "ssh -o StrictHostKeyChecking=no ec2-user@54.86.25.242  ${dockerRunCmd}"
+//                     }  
+//                 }
+//             }
+//         }
 
         // stage('commit and push to git'){
         //     steps{
