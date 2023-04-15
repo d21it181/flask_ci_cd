@@ -83,7 +83,7 @@ pipeline {
         stage('deploy'){
             steps{
                 script{
-                    def dockerRunCmd = "sudo docker run -p 8080:8080 -d mayur181/flask"
+                    def dockerRunCmd = "sudo docker run -p 5000:5000 -d mayur181/flask"
                     def dockerRestart = 'sudo service docker restart'
                   sshagent(['ec2-prod']) {
                         sh "ssh -o StrictHostKeyChecking=no ec2-user@34.226.196.171 ${dockerRestart}"
