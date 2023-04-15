@@ -3,7 +3,10 @@
 pipeline {
     agent any
     environment {
-        NEW_VERSION = '1.3'
+//         NEW_VERSION = '1.3'
+        NAME = "flask"
+        VERSION = "${env.BUILD_ID}-${env.GIT_COMMIT}"
+        IMAGE = "${NAME}:${VERSION}"
     }
 
     parameters {
@@ -46,8 +49,8 @@ pipeline {
 //                     sh 'mvn build-helper:parse-version versions:set -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.nextMinorVersion}.\\\${parsedVersion.incrementalVersion}\\\${parsedVersion.qualifier?}' 
 //                     sh 'mvn clean package'
 //                     def version = (readFile('pom.xml') =~ '<version>(.+)</version>')[0][1]
-//                     env.IMAGE_NAME = "$version-Build-$BUILD_NUMBER"
-                    sh "docker build -t mayur181/flask ."    
+//                     env.IMAGE_NAME = "${IMAGE}"
+                    sh "docker build -t mayur181/${IMAGE} ."    
                     }
             }
         }
@@ -75,7 +78,7 @@ pipeline {
                 script{echo 'deploying the application'
                 withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
                     sh "echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin"
-                    sh "docker push mayur181/flask"
+                    sh "docker push mayur181/${IMAGE}"
                 }}
                 
              }
@@ -83,7 +86,7 @@ pipeline {
         stage('deploy'){
             steps{
                 script{
-                    def dockerRunCmd = "sudo docker run -p 5000:5000 -d mayur181/flask"
+                    def dockerRunCmd = "sudo docker run -p 5000:5000 -d mayur181/${IMAGE}"
                     def dockerRestart = 'sudo service docker restart'
                   sshagent(['ec2-prod']) {
                         sh "ssh -o StrictHostKeyChecking=no ec2-user@34.226.196.171 ${dockerRestart}"
