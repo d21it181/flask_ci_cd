@@ -89,8 +89,8 @@ pipeline {
                     def dockerRunCmd = "sudo docker run -p 80:5000 -d mayur181/${IMAGE}"
                     def dockerRestart = 'sudo service docker restart'
                   sshagent(['ec2-prod']) {
-                        sh "ssh -o StrictHostKeyChecking=no ec2-user@34.226.196.171 ${dockerRestart}"
-                        sh "ssh -o StrictHostKeyChecking=no ec2-user@34.226.196.171 ${dockerRunCmd}"
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@54.237.231.196 ${dockerRestart}"
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@54.237.231.196 ${dockerRunCmd}"
                     }  
                 }
             }
