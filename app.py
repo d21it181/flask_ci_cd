@@ -190,3 +190,5 @@ class PricceClass(Resource):
             print(e)
             historical.abort(400, "Please enter date in valid format.", statusCode = "400")
    
+if __name__ == "__main__":
+    app.run()
